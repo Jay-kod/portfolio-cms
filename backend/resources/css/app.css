@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.vue';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-primary: #00ff88;
+    --color-primary-dark: #00cc6a;
+    --color-primary-light: #33ffaa;
+}
+
+/* Page transition styles */
+.page-enter-active,
+.page-leave-active {
+    transition: opacity 0.2s ease;
+}
+.page-enter-from,
+.page-leave-to {
+    opacity: 0;
+}
+
+/* NProgress overrides (page transition preloader) */
+#nprogress .bar {
+    background: linear-gradient(90deg, #00ff88, #33ffaa, #00cc6a) !important;
+    height: 3px !important;
+    z-index: 70 !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 10px #00ff88, 0 0 5px #00ff88 !important;
+}

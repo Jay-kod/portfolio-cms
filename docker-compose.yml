@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: portfolio-backend
+    container_name: portfolio-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: portfolio_cms
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+      APP_URL: http://localhost
+    depends_on:
+      - db
+    networks:
+      - portfolio-network
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: portfolio-frontend
+    container_name: portfolio-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/storage/app/public:/usr/share/nginx/html/storage
+      # Actually, the frontend container Nginx is proxying /api to 'app'. 
+      # But static files in 'storage' (like generated PDFs or uploaded images) need to be accessible.
+      # We might need a shared volume or proxy /storage to 'app' (if app had an nginx).
+      # Since 'app' is just PHP-FPM, it can't serve static files.
+      # So 'web' (Nginx) must serve them.
+      # We need to mount the backend storage path to the frontend container.
+    depends_on:
+      - app
+    networks:
+      - portfolio-network
+
+  db:
+    image: mysql:8.0
+    container_name: portfolio-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: portfolio_cms
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306" # Exposed for debugging, can be removed for security
+    networks:
+      - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  db_data:
