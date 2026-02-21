@@ -19,7 +19,12 @@ createInertiaApp({
     },
     resolve: (name) => {
         const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
-        return pages[`./Pages/${name}.vue`];
+        const page = pages[`./Pages/${name}.vue`];
+        if (!page) {
+            console.error(`Page not found: ${name}`);
+            return pages['./Pages/Errors/ErrorPage.vue'];
+        }
+        return page;
     },
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
